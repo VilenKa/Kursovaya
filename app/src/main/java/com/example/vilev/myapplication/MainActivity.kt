@@ -1,5 +1,6 @@
 package com.example.vilev.myapplication
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -9,22 +10,17 @@ import java.io.DataOutputStream
 import java.net.InetAddress
 import java.net.Socket
 import android.widget.Toast
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.runBlocking
 import kotlinx.android.synthetic.main.layout1.*
-import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
-import java.io.DataInputStream
-import java.nio.ByteBuffer
 import moe.codeest.rxsocketclient.meta.ThreadStrategy
 import kotlin.text.Charsets
 import moe.codeest.rxsocketclient.meta.SocketConfig
 import moe.codeest.rxsocketclient.RxSocketClient
 import moe.codeest.rxsocketclient.SocketClient
 import moe.codeest.rxsocketclient.SocketSubscriber
-import java.net.SocketOption
 
 
 var ipd = ""
@@ -33,13 +29,29 @@ class MainActivity : AppCompatActivity() {
         var serIpAddress: String? = null       // адрес сервера
         var port = 1089       // порт
         var msg: String = ""               // Сообщение
-        val codeMsg: Byte = 1 // Оправить сообщение
-        val codeHello: Byte = 3
+        val codeConnect: Byte = 0
+        val codeGame1: Byte = 1
+        val codeGame2: Byte = 2
+        val codeGame3: Byte = 3
+        val codeGame4: Byte = 4
+        val codeGame5: Byte = 5
+        val codeGame6: Byte = 6
+        val codeGame7: Byte = 7
+        val codeGame8: Byte = 8
+        val codeGame9: Byte = 9
+        val codeGame10: Byte = 10
+        val codeGame11: Byte = 11
+        val codeGame12: Byte = 12
+        val codeGame13: Byte = 13
+        val codeGame14: Byte = 14
+        val codeGame15: Byte = 15
+        val codeGame16: Byte = 16
+        val codeHello: Byte = 51
         var codeCommand: Byte = 0
     }
 
     lateinit var ipAddress: InetAddress
-
+    lateinit var mClient: SocketClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,12 +72,40 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun goToGameScreen(){
+        val intent = Intent(this, GameActivity::class.java)
+        startActivity(intent)
+    }
+
     fun Heloo(){
 
-//        launch{ listen() }
-//                launch { netShit(codeHello) }
+        var ref  = mClient.connect()
+        ref.subscribe(object : SocketSubscriber(){
+            override fun onConnected() {
+                var b = ByteArray(8096)
+                b[0] = codeHello
+                mClient.sendData(b)
+            }
 
-        val mClient = RxSocketClient
+            override fun onDisconnected() {
+                print("h")
+            }
+
+            override fun onResponse(data: ByteArray) {
+//                launch(UI) { Toast.makeText(applicationContext, "HI!", Toast.LENGTH_LONG).show() }
+                launch(UI) { goToGameScreen() }
+            }
+        }
+        )
+    }
+
+    fun onConnectClick() = runBlocking {
+        async{
+            val etIPaddress = findViewById<View>(R.id.etIp) as EditText
+            ipd = etIPaddress.text.toString() // ip адрес сервера
+            ipAddress = InetAddress.getByName(ipd)
+        }
+        mClient = RxSocketClient
                 .create(SocketConfig.Builder()
                         .setIp(ipd)
                         .setPort(port)
@@ -74,112 +114,28 @@ class MainActivity : AppCompatActivity() {
                         .setTimeout(30 * 1000)
                         .build())
 
-        var ref  = mClient.connect()
-        ref.subscribe(object : SocketSubscriber(){
-            override fun onConnected() {
-                mClient.sendData("3")
-            }
-
-            override fun onDisconnected() {
-                print("h")
-            }
-
-            override fun onResponse(data: ByteArray) {
-                launch(UI) { Toast.makeText(applicationContext, "HI!", Toast.LENGTH_LONG).show() }
-            }
-
-        }
-        )
-
     }
 
-
-
-//    suspend fun listen() {
-//        val inputStream: DataInputStream
-//        val socket = Socket(ipAddress, port)
-//        inputStream = DataInputStream(socket.getInputStream())
-//        while (true){
-//           if(inputStream.read() > -1) {
-//               val theBytes = ByteArray(inputStream.available())
-//               inputStream.read(theBytes, 0, inputStream.available())
-//               inputStream.close()
-//               if (theBytes.toInt() == 42) {
-//                   Toast.makeText(applicationContext, "HI!", Toast.LENGTH_LONG).show()
-//               }
-//           }
-//        }
-//    }
-
-
-    fun onConnectClick() = runBlocking {
-        async{
-            val etIPaddress = findViewById<View>(R.id.etIp) as EditText
-            ipd = etIPaddress.text.toString()
-            // ip адрес сервера
-            ipAddress = InetAddress.getByName(ipd)
-//            val socket = Socket(ipAddress, port)
-            // Создаем сокет
-
-
-
-//                val socket = Socket(ipAddress, port)
-            // Получаем потоки ввод/вывода
-
-
-        }
-
-    }
-
-
-
-
-
-
-fun onClick() {
+    fun onClick() {
     msg = etMessage.text.toString()
-    launch() { netShit( codeMsg ) }
+    launch() { sendCode( codeConnect ) }
 }
 
-    suspend fun netShit(codeX: Byte){
+    suspend fun sendCode(codeX: Byte){
         try {
             val socket = Socket(ipAddress, port)
             val outputStream = socket.getOutputStream()
             val dataOutputStream = DataOutputStream(outputStream)
-                when (codeX) {
-                // В зависимости от кода команды посылаем сообщения
-                    codeMsg    // Сообщение
-                    -> {
-                        dataOutputStream.write(codeMsg.toInt())
+                        dataOutputStream.write(codeX.toInt())
                         // Устанавливаем кодировку символов UTF-8
                         val outMsg = msg?.toByteArray()
                         dataOutputStream.write(outMsg!!)
-                    }
-                    codeHello ->{
-                        dataOutputStream.write(codeHello.toInt())
-                    }
-                }
-            } catch (ex: Exception) {
+            } catch (ex: Throwable) {
                 ex.printStackTrace()
                 println("other $ex")
             }
 
     }
-
-//    fun ByteArray.toInt() : Int{
-//        var num = -1
-//        if(this.isNotEmpty()){
-//            val wrapped = ByteBuffer.wrap(this) // big-endian by default
-//            num = wrapped.getInt() // 1
-//        }
-
-
-//    val dbuf = ByteBuffer.allocate(2)
-//    dbuf.putShort(num)
-//    val bytes = dbuf.array() // { 0, 1 }
-//        return num
-//    }
-
 
 }
 
