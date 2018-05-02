@@ -30,22 +30,6 @@ class MainActivity : AppCompatActivity() {
         var port = 1089       // порт
         var msg: String = ""               // Сообщение
         val codeConnect: Byte = 0
-        val codeGame1: Byte = 1
-        val codeGame2: Byte = 2
-        val codeGame3: Byte = 3
-        val codeGame4: Byte = 4
-        val codeGame5: Byte = 5
-        val codeGame6: Byte = 6
-        val codeGame7: Byte = 7
-        val codeGame8: Byte = 8
-        val codeGame9: Byte = 9
-        val codeGame10: Byte = 10
-        val codeGame11: Byte = 11
-        val codeGame12: Byte = 12
-        val codeGame13: Byte = 13
-        val codeGame14: Byte = 14
-        val codeGame15: Byte = 15
-        val codeGame16: Byte = 16
         val codeHello: Byte = 51
         var codeCommand: Byte = 0
     }
