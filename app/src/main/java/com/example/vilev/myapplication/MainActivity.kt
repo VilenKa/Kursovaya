@@ -35,7 +35,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var ipAddress: InetAddress
-    lateinit var mClient: SocketClient
+//    lateinit var mClient: SocketClient
+    var netStuff = NetStuff()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,13 +63,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun Heloo(){
-
-        var ref  = mClient.connect()
+        netStuff.createSocketClient(ipd, port)
+        var ref  = netStuff.connect()
         ref.subscribe(object : SocketSubscriber(){
             override fun onConnected() {
-                var b = ByteArray(8096)
-                b[0] = codeHello
-                mClient.sendData(b)
+               netStuff.sendCode(codeHello)
             }
 
             override fun onDisconnected() {
@@ -76,7 +75,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(data: ByteArray) {
-//                launch(UI) { Toast.makeText(applicationContext, "HI!", Toast.LENGTH_LONG).show() }
                 launch(UI) { goToGameScreen() }
             }
         }
@@ -89,21 +87,42 @@ class MainActivity : AppCompatActivity() {
             ipd = etIPaddress.text.toString() // ip адрес сервера
             ipAddress = InetAddress.getByName(ipd)
         }
-        mClient = RxSocketClient
-                .create(SocketConfig.Builder()
-                        .setIp(ipd)
-                        .setPort(port)
-                        .setCharset(Charsets.UTF_8)
-                        .setThreadStrategy(ThreadStrategy.ASYNC)
-                        .setTimeout(30 * 1000)
-                        .build())
+
+
 
     }
 
     fun onClick() {
-    msg = etMessage.text.toString()
-    launch() { sendCode( codeConnect ) }
+//    msg = etMessage.text.toString()
+////    launch() { sendCode( codeConnect ) }
+//        netStuff.createSocketClient(ipd, port)
+//        netStuff.sendCode(codeConnect)
+
+        netStuff.createSocketClient(ipd, port)
+        var ref  = netStuff.connect()
+        ref.subscribe(object : SocketSubscriber(){
+            override fun onConnected() {
+                netStuff.sendCode(codeConnect)
+            }
+
+            override fun onDisconnected() {
+                print("h")
+            }
+
+            override fun onResponse(data: ByteArray) {
+
+            }
+        }
+        )
+
+
 }
+
+    fun sendCodeRx(codeX: Byte){
+
+    }
+
+
 
     suspend fun sendCode(codeX: Byte){
         try {
