@@ -88,8 +88,6 @@ class MainActivity : AppCompatActivity() {
             ipd = etIPaddress.text.toString() // ip адрес сервера
             ipAddress = InetAddress.getByName(ipd)
         }
-
-
     }
 
     fun onClick() {

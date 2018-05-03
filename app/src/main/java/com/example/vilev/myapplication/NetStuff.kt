@@ -19,12 +19,12 @@ class NetStuff {
                         .setPort(port)
                         .setCharset(Charsets.UTF_8)
                         .setThreadStrategy(ThreadStrategy.ASYNC)
-                        .setTimeout(30 * 1000)
+                        .setTimeout(5 * 1000)
                         .build())
     }
 
     fun disconect(){
-        mClient.disconnect()
+//        mClient.disconnect()
     }
 
     fun sendCode(code: Byte){
