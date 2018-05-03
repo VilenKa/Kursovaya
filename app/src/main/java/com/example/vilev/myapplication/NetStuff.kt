@@ -24,7 +24,7 @@ class NetStuff {
     }
 
     fun disconect(){
-//        mClient.disconnect()
+        mClient.disconnect()
     }
 
     fun sendCode(code: Byte){

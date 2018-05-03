@@ -89,12 +89,10 @@ class SelectGameActivity: AppCompatActivity() {
 
             override fun onResponse(data: ByteArray) {
                 launch(UI) { goToGameScreen() }
+                netStuff.disconect()
             }
         }
         )
-
-
-
     }
 
 }

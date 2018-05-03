@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(data: ByteArray) {
-                netStuff.disconect()
+//                netStuff.disconect()
             }
         }
         )
