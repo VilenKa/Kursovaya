@@ -9,9 +9,10 @@ import java.util.*
 
 class NetStuff {
 
+    val port = 1089
     lateinit var mClient: SocketClient
 
-    fun createSocketClient(ipd: String, port: Int){
+    fun createSocketClient(ipd: String){
         mClient = RxSocketClient
                 .create(SocketConfig.Builder()
                         .setIp(ipd)
@@ -20,6 +21,10 @@ class NetStuff {
                         .setThreadStrategy(ThreadStrategy.ASYNC)
                         .setTimeout(30 * 1000)
                         .build())
+    }
+
+    fun disconect(){
+        mClient.disconnect()
     }
 
     fun sendCode(code: Byte){

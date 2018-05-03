@@ -24,10 +24,10 @@ import moe.codeest.rxsocketclient.SocketSubscriber
 
 
 var ipd = ""
+
 class MainActivity : AppCompatActivity() {
     companion object {
         var serIpAddress: String? = null       // адрес сервера
-        var port = 1089       // порт
         var msg: String = ""               // Сообщение
         val codeConnect: Byte = 0
         val codeHello: Byte = 51
@@ -35,19 +35,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var ipAddress: InetAddress
-//    lateinit var mClient: SocketClient
+    //    lateinit var mClient: SocketClient
     var netStuff = NetStuff()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout1)
         val sndBtn = findViewById<Button>(R.id.btnSend)
-        val connectBtn  = findViewById<Button>(R.id.btnConnect)
+        val connectBtn = findViewById<Button>(R.id.btnConnect)
 
-        btnHello.setOnClickListener{
+        btnHello.setOnClickListener {
             Heloo()
         }
-        connectBtn.setOnClickListener{
+        connectBtn.setOnClickListener {
             onConnectClick()
         }
 
@@ -57,17 +57,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun goToGameScreen(){
-        val intent = Intent(this, GameActivity::class.java)
+    fun goToSelectGameScreen() {
+        val intent = Intent(this, SelectGameActivity::class.java)
         startActivity(intent)
     }
 
-    fun Heloo(){
-        netStuff.createSocketClient(ipd, port)
-        var ref  = netStuff.connect()
-        ref.subscribe(object : SocketSubscriber(){
+    fun Heloo() {
+        netStuff.createSocketClient(ipd)
+        var ref = netStuff.connect()
+        ref.subscribe(object : SocketSubscriber() {
             override fun onConnected() {
-               netStuff.sendCode(codeHello)
+                netStuff.sendCode(codeHello)
             }
 
             override fun onDisconnected() {
@@ -75,32 +75,27 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(data: ByteArray) {
-                launch(UI) { goToGameScreen() }
+                launch(UI) { goToSelectGameScreen() }
+                netStuff.disconect()
             }
         }
         )
     }
 
     fun onConnectClick() = runBlocking {
-        async{
+        async {
             val etIPaddress = findViewById<View>(R.id.etIp) as EditText
             ipd = etIPaddress.text.toString() // ip адрес сервера
             ipAddress = InetAddress.getByName(ipd)
         }
 
 
-
     }
 
     fun onClick() {
-//    msg = etMessage.text.toString()
-////    launch() { sendCode( codeConnect ) }
-//        netStuff.createSocketClient(ipd, port)
-//        netStuff.sendCode(codeConnect)
-
-        netStuff.createSocketClient(ipd, port)
-        var ref  = netStuff.connect()
-        ref.subscribe(object : SocketSubscriber(){
+        netStuff.createSocketClient(ipd)
+        var ref = netStuff.connect()
+        ref.subscribe(object : SocketSubscriber() {
             override fun onConnected() {
                 netStuff.sendCode(codeConnect)
             }
@@ -110,35 +105,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(data: ByteArray) {
-
+                netStuff.disconect()
             }
         }
         )
 
 
-}
-
-    fun sendCodeRx(codeX: Byte){
-
     }
-
-
-
-    suspend fun sendCode(codeX: Byte){
-        try {
-            val socket = Socket(ipAddress, port)
-            val outputStream = socket.getOutputStream()
-            val dataOutputStream = DataOutputStream(outputStream)
-                        dataOutputStream.write(codeX.toInt())
-                        // Устанавливаем кодировку символов UTF-8
-                        val outMsg = msg?.toByteArray()
-                        dataOutputStream.write(outMsg!!)
-            } catch (ex: Throwable) {
-                ex.printStackTrace()
-                println("other $ex")
-            }
-
-    }
-
 }
 
