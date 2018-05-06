@@ -41,19 +41,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout1)
-        val sndBtn = findViewById<Button>(R.id.btnSend)
-        val connectBtn = findViewById<Button>(R.id.btnConnect)
 
         btnHello.setOnClickListener {
+            onConnectClick()
             Heloo()
         }
-        connectBtn.setOnClickListener {
-            onConnectClick()
-        }
 
-        sndBtn.setOnClickListener() {
-            onClick()
-        }
 
     }
 
